@@ -8,20 +8,16 @@
   <meta name="color-scheme" content="light dark" />
   <style>
     :root{
-      /* Unified accent color */
-      --accent: #089ca4;
+      --accent:#089ca4;
 
-      /* Dark theme defaults */
-      --bg: #0b1020;
-      --bg-2:#0f152e;
-      --card: rgba(255,255,255,0.08);
-      --text:#e8ecf4;
-      --muted:#b7c1d6;
-      --ring: 0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent);
-      --shadow-lg: 0 10px 30px rgba(0,0,0,.35);
+      /* Dark default */
+      --bg:#0b1020; --bg-2:#0f152e; --card:rgba(255,255,255,.08);
+      --text:#e8ecf4; --muted:#b7c1d6;
+      --ring:0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent);
+      --shadow-lg:0 10px 30px rgba(0,0,0,.35);
     }
     [data-theme="light"]{
-      --bg:#f5f7fb; --bg-2:#edf1f8; --card:rgba(255,255,255,0.7);
+      --bg:#f5f7fb; --bg-2:#edf1f8; --card:rgba(255,255,255,.7);
       --text:#101624; --muted:#3b455a; --shadow-lg:0 10px 30px rgba(16,22,36,.12);
     }
 
@@ -32,7 +28,7 @@
         radial-gradient(1200px 600px at 10% -10%, color-mix(in srgb, var(--accent) 40%, transparent), transparent 55%),
         radial-gradient(1000px 600px at 120% 10%, color-mix(in srgb, var(--accent) 32%, transparent), transparent 55%),
         linear-gradient(160deg, var(--bg), var(--bg-2));
-      font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+      font:15px/1.6 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
       overflow-y: overlay;
     }
 
@@ -41,132 +37,106 @@
     /* Header */
     .header{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px; }
     .brand{ display:flex; align-items:center; gap:12px; font-weight:700; letter-spacing:.2px; }
-    /* Image logo */
+
+    /* Your uploaded logo */
     .logo-img{
-      width:40px; height:40px; border-radius:10px; /* rounded-square look */
-      object-fit:contain; background:#ffffff; padding:5px;
-      box-shadow: 0 4px 18px rgba(8,156,164,0.45); /* #089ca4 shadow */
+      width:40px; height:40px; border-radius:10px;
+      object-fit:contain; background:#fff; padding:5px;
+      box-shadow:0 4px 18px rgba(8,156,164,.45);
     }
-    .brand:hover .logo-img{ transform: translateY(-1px); transition: transform .12s ease; }
+    .brand:hover .logo-img{ transform:translateY(-1px); transition:transform .12s ease; }
 
     .title{ font-size:clamp(18px,2.4vw,24px) }
     .muted{ color:var(--muted); font-weight:500 }
 
-    /* Card (glass + gradient border) */
+    /* Card */
     .card{
-      position:relative; border-radius:18px;
-      background: linear-gradient(180deg, color-mix(in srgb, var(--card) 90%, transparent), var(--card));
-      box-shadow: var(--shadow-lg);
-      overflow:hidden;
-      backdrop-filter: blur(8px);
-      border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
-      isolation: isolate;
+      position:relative; border-radius:18px; overflow:hidden; isolation:isolate;
+      background:linear-gradient(180deg, color-mix(in srgb, var(--card) 90%, transparent), var(--card));
+      box-shadow:var(--shadow-lg);
+      border:1px solid color-mix(in srgb, var(--text) 10%, transparent);
+      backdrop-filter:blur(8px);
     }
     .card::before{
       content:""; position:absolute; inset:-1px; z-index:-1; border-radius:20px;
-      background: linear-gradient(120deg, color-mix(in srgb, var(--accent) 80%, transparent), color-mix(in srgb, var(--accent) 60%, transparent));
-      filter: blur(18px) saturate(120%); opacity:.55;
-      animation: float 8s ease-in-out infinite alternate;
+      background:linear-gradient(120deg, color-mix(in srgb, var(--accent) 80%, transparent), color-mix(in srgb, var(--accent) 60%, transparent));
+      filter:blur(18px) saturate(120%); opacity:.55; animation:float 8s ease-in-out infinite alternate;
     }
-    @keyframes float{
-      from { transform: translateY(-4px) rotate(0.5deg); opacity:.5 }
-      to   { transform: translateY(4px) rotate(-0.5deg); opacity:.8 }
-    }
+    @keyframes float{ from{ transform:translateY(-4px) rotate(.5deg); opacity:.5 } to{ transform:translateY(4px) rotate(-.5deg); opacity:.8 } }
 
     .card-head{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding:14px clamp(14px, 2.2vw, 20px);
-      border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+      padding:14px clamp(14px,2.2vw,20px);
+      border-bottom:1px solid color-mix(in srgb, var(--text) 10%, transparent);
     }
-    .card-title{ font-size:clamp(16px, 2vw, 20px); font-weight:700; }
+    .card-title{ font-size:clamp(16px,2vw,20px); font-weight:700; }
 
     /* Actions */
     .actions{ display:flex; flex-wrap:wrap; gap:8px; }
     .btn{
-      appearance:none; border:none; cursor:pointer;
+      appearance:none; border:none; cursor:pointer; text-decoration:none;
       padding:10px 12px; border-radius:12px; font-weight:700;
-      color:#0b1020; background: linear-gradient(180deg,#fff,#ebf9fb);
-      box-shadow: 0 6px 20px rgba(16,22,36,.15);
-      transition: transform .12s ease, box-shadow .12s ease;
-      display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+      color:#0b1020; background:linear-gradient(180deg,#fff,#ebf9fb);
+      box-shadow:0 6px 20px rgba(16,22,36,.15);
+      transition:transform .12s ease, box-shadow .12s ease;
+      display:inline-flex; align-items:center; gap:8px;
     }
-    .btn:hover{ transform: translateY(-2px); box-shadow: 0 10px 28px rgba(16,22,36,.22) }
-    .btn:active{ transform: translateY(0) scale(.98) }
+    .btn:hover{ transform:translateY(-2px); box-shadow:0 10px 28px rgba(16,22,36,.22) }
+    .btn:active{ transform:translateY(0) scale(.98) }
     .btn.accent{
-      color: white;
-      background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #32d6df));
-      box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 45%, transparent);
+      color:#fff; background:linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #32d6df));
+      box-shadow:0 8px 24px color-mix(in srgb, var(--accent) 45%, transparent);
     }
-    .btn.ghost{
-      background: transparent; color: var(--text);
-      border:1px solid color-mix(in srgb, var(--text) 16%, transparent);
-      box-shadow: none;
-    }
+    .btn.ghost{ background:transparent; color:var(--text); border:1px solid color-mix(in srgb, var(--text) 16%, transparent) }
     .chip{ font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid color-mix(in srgb, var(--text) 16%, transparent); color:var(--muted) }
 
-    /* Viewer */
-    .viewer{ position:relative; height:min(84vh, 1000px); background:#0002; }
+    /* Viewer (height will be set by JS to fit one screen) */
+    .viewer{ position:relative; height:70vh; background:#0002; }
     .viewer iframe{ width:100%; height:100%; border:0; display:block; background:#1b2236; }
 
     /* Loading overlay */
     .loading{
       position:absolute; inset:0; display:grid; place-items:center;
-      background: linear-gradient(180deg, #0b102015, transparent);
-      transition: opacity .25s ease; z-index:2;
+      background:linear-gradient(180deg, #0b102015, transparent);
+      transition:opacity .25s ease; z-index:2;
     }
     .spinner{
       width:56px; height:56px; border-radius:50%;
-      background: conic-gradient(from 0deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #9ff2f7), var(--accent));
-      -webkit-mask: radial-gradient(farthest-side, transparent 62%, #000 63%);
-              mask: radial-gradient(farthest-side, transparent 62%, #000 63%);
-      animation: spin 1s linear infinite;
-      filter: saturate(130%) drop-shadow(0 6px 20px rgba(0,0,0,.35));
+      background:conic-gradient(from 0deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #9ff2f7), var(--accent));
+      -webkit-mask:radial-gradient(farthest-side, transparent 62%, #000 63%);
+              mask:radial-gradient(farthest-side, transparent 62%, #000 63%);
+      animation:spin 1s linear infinite; filter:saturate(130%) drop-shadow(0 6px 20px rgba(0,0,0,.35));
     }
-    @keyframes spin{ to{ transform: rotate(1turn)} }
+    @keyframes spin{ to{ transform:rotate(1turn) } }
 
-    /* Footer */
     .foot{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding: 10px clamp(14px, 2.2vw, 20px);
-      border-top: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
-      color: var(--muted);
-      font-size: 13px;
+      padding:10px clamp(14px,2.2vw,20px);
+      border-top:1px solid color-mix(in srgb, var(--text) 10%, transparent);
+      color:var(--muted); font-size:13px;
     }
 
-    /* Theme toggle */
     .toggle{ display:inline-flex; align-items:center; gap:10px; color:var(--muted); user-select:none; cursor:pointer; }
-    .switch{
-      width:48px; height:28px; border-radius:999px; position:relative; background:#ffffff22;
-      border:1px solid color-mix(in srgb, var(--text) 20%, transparent);
-    }
-    .switch::after{
-      content:""; width:22px; height:22px; border-radius:50%;
-      position:absolute; top:2px; left:2px; background:white;
-      box-shadow: 0 4px 12px rgba(0,0,0,.2);
-      transition: left .2s ease;
-    }
+    .switch{ width:48px; height:28px; border-radius:999px; position:relative; background:#ffffff22; border:1px solid color-mix(in srgb, var(--text) 20%, transparent) }
+    .switch::after{ content:""; width:22px; height:22px; border-radius:50%; position:absolute; top:2px; left:2px; background:#fff; box-shadow:0 4px 12px rgba(0,0,0,.2); transition:left .2s ease }
     [data-theme="light"] .switch::after{ left:24px }
 
-    /* Mobile tweaks */
     @media (max-width:720px){
-      .viewer{ height: 78vh }
-      .actions{ width:100% }
       .header{ flex-direction:column; align-items:flex-start }
+      .actions{ width:100% }
       .foot{ flex-direction:column; align-items:flex-start; gap:6px }
     }
 
-    /* Accessibility focus */
-    .btn:focus-visible, .switch:focus-visible { outline: none; box-shadow: var(--ring) }
-    a{ color: color-mix(in srgb, var(--accent) 80%, white) }
+    .btn:focus-visible, .switch:focus-visible { outline:none; box-shadow:var(--ring) }
+    a{ color:color-mix(in srgb, var(--accent) 80%, white) }
   </style>
 </head>
 <body>
   <div class="wrap">
     <!-- Header -->
-    <header class="header">
+    <header class="header" id="topHeader">
       <div class="brand">
-        <!-- Your uploaded logo -->
-        ./BL_Technolas.png
+        <img src="./BL_Technolas.png" class="logo-img" alt="B&L Technolas logo">
         <div>
           <div class="title">TPV B&amp;L Scan me</div>
           <div class="muted">Fast • Clean • No watermark</div>
@@ -181,11 +151,11 @@
 
     <!-- Card -->
     <section class="card" id="card">
-      <div class="card-head">
+      <div class="card-head" id="cardHead">
         <div class="card-title">TPV Munich — PDF</div>
         <div class="actions">
           <button class="btn accent" id="openBtn">Open</button>
-          ./TPV%20Munich.pdf" download class="btn">Download</a>
+          <a id="downloadBtn" href="./TPV%20Munich.pdf" download class="btn">Download</a>
           <button class="btn" id="copyBtn">Copy link</button>
           <button class="btn ghost" id="fullscreenBtn">Full screen</button>
           <span class="chip" id="statusChip">Loading…</span>
@@ -193,14 +163,12 @@
       </div>
 
       <div class="viewer" id="viewer">
-        <div class="loading" id="loading">
-          <div class="spinner" aria-hidden="true"></div>
-        </div>
-        <!-- Browser’s native PDF viewer -->
+        <div class="loading" id="loading"><div class="spinner" aria-hidden="true"></div></div>
+        <!-- Native browser PDF viewer -->
         <iframe id="pdfFrame" title="PDF document"></iframe>
       </div>
 
-      <div class="foot">
+      <div class="foot" id="cardFoot">
         <div>Tip: If the PDF doesn’t appear on some phones, tap <strong>Open</strong>.</div>
         <div>Served by GitHub Pages — zero tracking, zero ads.</div>
       </div>
@@ -208,12 +176,8 @@
   </div>
 
   <script>
-    /* =========================
-       CONFIG — your PDF path
-       ========================= */
-    const pdfUrl = './TPV%20Munich.pdf'; // keep %20 for the space
-
-    /* Elements */
+    /* ===== CONFIG ===== */
+    const pdfUrl = './TPV%20Munich.pdf';   // keep %20 for the space
     const frame = document.getElementById('pdfFrame');
     const loading = document.getElementById('loading');
     const statusChip = document.getElementById('statusChip');
@@ -224,9 +188,13 @@
     const viewer = document.getElementById('viewer');
     const downloadBtn = document.getElementById('downloadBtn');
 
-    /* Load PDF in iframe (fit horizontally, hide sidebars) */
-    const urlWithParams = `${pdfUrl}#view=FitH&toolbar=1&statusbar=0&navpanes=0`;
+    /* ===== Load PDF =====
+       page-fit shows the whole page in the available area (fits one screen)
+       If you prefer width: use zoom=page-width
+    */
+    const urlWithParams = `${pdfUrl}#page=1&zoom=page-fit&toolbar=1&statusbar=0&navpanes=0`;
     frame.src = urlWithParams;
+    downloadBtn.href = pdfUrl;
 
     let loaded = false;
     frame.addEventListener('load', () => {
@@ -236,7 +204,7 @@
       statusChip.textContent = 'Ready';
     });
 
-    // Fallback hint if viewer doesn’t render in ~6s (rare iOS cases)
+    // If not loaded in ~6s (some iOS cases), remove loader and hint "Open externally"
     setTimeout(() => {
       if (!loaded) {
         statusChip.textContent = 'Open externally';
@@ -245,7 +213,19 @@
       }
     }, 6000);
 
-    /* Actions */
+    /* ===== Fit viewer height to one screen ===== */
+    function sizeViewer(){
+      const headerH = document.getElementById('topHeader').offsetHeight || 0;
+      const headH   = document.getElementById('cardHead').offsetHeight || 0;
+      const footH   = document.getElementById('cardFoot').offsetHeight || 0;
+      const outerMargins = 40; // wrap margins/paddings approx
+      const h = Math.max(320, window.innerHeight - headerH - headH - footH - outerMargins);
+      viewer.style.height = h + 'px';
+    }
+    sizeViewer();
+    window.addEventListener('resize', sizeViewer);
+
+    /* ===== Actions ===== */
     openBtn.addEventListener('click', () => window.open(pdfUrl, '_blank', 'noopener,noreferrer'));
 
     copyBtn.addEventListener('click', async () => {
@@ -254,26 +234,23 @@
         await navigator.clipboard.writeText(absolute);
         toast('Link copied');
       }catch{
-        toast('Copy failed — long press Open and copy link');
+        toast('Copy failed — long-press Open and copy link');
       }
     });
 
     fsBtn.addEventListener('click', async () => {
-      const el = viewer;
       try{
         if (!document.fullscreenElement) {
-          await (el.requestFullscreen?.() || el.webkitRequestFullscreen?.());
+          await (viewer.requestFullscreen?.() || viewer.webkitRequestFullscreen?.());
           fsBtn.textContent = 'Exit full screen';
         } else {
           await (document.exitFullscreen?.() || document.webkitExitFullscreen?.());
           fsBtn.textContent = 'Full screen';
         }
-      }catch{
-        toast('Fullscreen not supported');
-      }
+      }catch{ toast('Fullscreen not supported'); }
     });
 
-    /* Theme (auto + toggle + persist) */
+    /* ===== Theme (auto + toggle + persist) ===== */
     const savedTheme = localStorage.getItem('theme');
     const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
     const initial = savedTheme || (prefersLight ? 'light' : 'dark');
@@ -290,13 +267,13 @@
     themeSwitch.addEventListener('click', toggleTheme);
     themeSwitch.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); toggleTheme(); }});
 
-    /* Tiny toast */
+    /* ===== Tiny toast ===== */
     function toast(msg){
       const t = document.createElement('div');
       t.textContent = msg;
       Object.assign(t.style,{
         position:'fixed', left:'50%', bottom:'22px', transform:'translateX(-50%)',
-        background: 'linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #32d6df))',
+        background:'linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #32d6df))',
         color:'#fff', padding:'10px 14px', borderRadius:'12px', boxShadow:'0 8px 24px rgba(0,0,0,.28)',
         zIndex:9999, fontWeight:'700', transition:'opacity .2s ease'
       });
@@ -305,7 +282,7 @@
       setTimeout(()=> t.remove(), 1800);
     }
 
-    /* Keyboard shortcuts */
+    /* ===== Shortcuts ===== */
     document.addEventListener('keydown', (e)=>{
       if(e.key.toLowerCase() === 'o') openBtn.click();      // O = Open
       if(e.key.toLowerCase() === 'f') fsBtn.click();        // F = Full screen
