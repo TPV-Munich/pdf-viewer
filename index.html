@@ -11,7 +11,7 @@
       /* Unified accent color */
       --accent: #089ca4;
 
-      /* Base tokens (dark default) */
+      /* Dark theme defaults */
       --bg: #0b1020;
       --bg-2:#0f152e;
       --card: rgba(255,255,255,0.08);
@@ -28,7 +28,6 @@
     html,body{height:100%}
     body{
       margin:0; color:var(--text);
-      /* subtle background with the same accent color */
       background:
         radial-gradient(1200px 600px at 10% -10%, color-mix(in srgb, var(--accent) 40%, transparent), transparent 55%),
         radial-gradient(1000px 600px at 120% 10%, color-mix(in srgb, var(--accent) 32%, transparent), transparent 55%),
@@ -42,20 +41,18 @@
     /* Header */
     .header{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px; }
     .brand{ display:flex; align-items:center; gap:12px; font-weight:700; letter-spacing:.2px; }
-    .logo{
-      width:38px; height:38px; border-radius:12px; position:relative;
-      background: conic-gradient(from 40deg, color-mix(in srgb, var(--accent) 85%, white 15%), var(--accent));
-      filter: saturate(120%);
-      box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 60%, transparent);
+    /* Image logo */
+    .logo-img{
+      width:40px; height:40px; border-radius:10px; /* rounded-square look */
+      object-fit:contain; background:#ffffff; padding:5px;
+      box-shadow: 0 4px 18px rgba(8,156,164,0.45); /* #089ca4 shadow */
     }
-    .logo::after{
-      content:""; position:absolute; inset:2px; border-radius:10px;
-      background: linear-gradient(180deg, #ffffffaa, #ffffff10);
-    }
+    .brand:hover .logo-img{ transform: translateY(-1px); transition: transform .12s ease; }
+
     .title{ font-size:clamp(18px,2.4vw,24px) }
     .muted{ color:var(--muted); font-weight:500 }
 
-    /* Card */
+    /* Card (glass + gradient border) */
     .card{
       position:relative; border-radius:18px;
       background: linear-gradient(180deg, color-mix(in srgb, var(--card) 90%, transparent), var(--card));
@@ -168,7 +165,8 @@
     <!-- Header -->
     <header class="header">
       <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
+        <!-- Your uploaded logo -->
+        ./BL_Technolas.png
         <div>
           <div class="title">TPV B&amp;L Scan me</div>
           <div class="muted">Fast • Clean • No watermark</div>
@@ -187,7 +185,7 @@
         <div class="card-title">TPV Munich — PDF</div>
         <div class="actions">
           <button class="btn accent" id="openBtn">Open</button>
-          <a class="btn" id="downloadBtn" href="#" download>Download</a>
+          ./TPV%20Munich.pdf" download class="btn">Download</a>
           <button class="btn" id="copyBtn">Copy link</button>
           <button class="btn ghost" id="fullscreenBtn">Full screen</button>
           <span class="chip" id="statusChip">Loading…</span>
@@ -229,7 +227,6 @@
     /* Load PDF in iframe (fit horizontally, hide sidebars) */
     const urlWithParams = `${pdfUrl}#view=FitH&toolbar=1&statusbar=0&navpanes=0`;
     frame.src = urlWithParams;
-    downloadBtn.href = pdfUrl;
 
     let loaded = false;
     frame.addEventListener('load', () => {
