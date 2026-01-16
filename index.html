@@ -1,10 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PDF Viewer</title>
-
   <style>
     :root{
       --accent:#089ca4;
@@ -15,7 +15,6 @@
       --border:rgba(255,255,255,.18);
       --shadow-lg:0 10px 30px rgba(0,0,0,.35);
     }
-
     html,body{height:100%}
     body{
       margin:0;
@@ -26,107 +25,30 @@
         linear-gradient(160deg, var(--bg), var(--bg-2));
       font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial;
     }
-
     .wrap{max-width:1100px;margin:32px auto;padding:0 16px}
-
-    /* ===== Header ===== */
-    .header{
-      display:flex;
-      justify-content:space-between;
-      margin-bottom:18px;
-    }
-
-    .logo-img{
-      width:420px;
-      max-width:100%;
-      height:auto;
-    }
-
-    /* ===== Card ===== */
-    .card{
-      border-radius:18px;
-      overflow:hidden;
-      background:linear-gradient(180deg,var(--card),var(--card));
-      box-shadow:var(--shadow-lg);
-      border:1px solid var(--border);
-    }
-
-    .card-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding:14px 20px;
-      border-bottom:1px solid var(--border);
-    }
-
-    .card-title{
-      font-size:18px;
-      font-weight:800;
-    }
-
-    .actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-
-    /* ===== Buttons (ALL SAME AS OPEN) ===== */
-    .btn{
-      appearance:none;
-      border:none;
-      cursor:pointer;
-      padding:10px 14px;
-      border-radius:12px;
-      font-weight:800;
-      color:#fff;
-      background:linear-gradient(135deg,var(--accent),#16c4cf);
-      box-shadow:0 6px 18px rgba(8,156,164,.45);
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-    }
-
+    .header{display:flex;justify-content:space-between;margin-bottom:18px;}
+    .logo-img{width:420px;max-width:100%;height:auto;}
+    .card{border-radius:18px;overflow:hidden;background:linear-gradient(180deg,var(--card),var(--card));box-shadow:var(--shadow-lg);border:1px solid var(--border);}
+    .card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 20px;border-bottom:1px solid var(--border);}
+    .card-title{font-size:18px;font-weight:800;}
+    .actions{display:flex;flex-wrap:wrap;gap:8px;}
+    .btn{appearance:none;border:none;cursor:pointer;padding:10px 14px;border-radius:12px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--accent),#16c4cf);box-shadow:0 6px 18px rgba(8,156,164,.45);display:inline-flex;align-items:center;gap:6px;}
     .btn:active{transform:scale(.97)}
-
-    .viewer{
-      height:70vh;
-      background:#000;
-    }
-
-    .viewer iframe{
-      width:100%;
-      height:100%;
-      border:0;
-      display:block;
-    }
-
-    .foot{
-      padding:10px 20px;
-      border-top:1px solid var(--border);
-      font-size:13px;
-      color:#b7c1d6;
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-    }
+    .viewer{height:70vh;background:#000;}
+    .viewer iframe{width:100%;height:100%;border:0;display:block;}
+    .foot{padding:10px 20px;border-top:1px solid var(--border);font-size:13px;color:#b7c1d6;display:flex;justify-content:space-between;gap:10px;}
   </style>
 </head>
-
 <body>
 <div class="wrap">
 
-  <!-- Header -->
   <header class="header">
     <img class="logo-img" src="BL_Technolas.png" alt="Bausch + Lomb | Technolas logo">
   </header>
 
-  <!-- Card -->
   <section class="card">
-
     <div class="card-head">
       <div class="card-title">Acty Guide Support — PDF</div>
-
       <div class="actions">
         <button class="btn" id="openBtn">Open</button>
         <a class="btn" id="downloadBtn" download>Download</a>
@@ -138,14 +60,13 @@
     </div>
 
     <div class="viewer" id="viewer">
-      <iframe id="pdfFrame"></iframe>
+      <iframe id="pdfFrame" allow="fullscreen"></iframe>
     </div>
 
     <div class="foot">
       <div>Tip: If the PDF doesn’t appear on some phones, tap <strong>Open</strong>.</div>
       <div>Powered By Technolas Bausch + Lomb</div>
     </div>
-
   </section>
 
 </div>
@@ -159,18 +80,16 @@
   let zoom = 100;
 
   function loadPdf(){
-    frame.src = `${pdfUrl}#page=1&zoom=${zoom}&toolbar=0&navpanes=0&scrollbar=0`;
+    frame.src = `${pdfUrl}#zoom=${zoom}`;
   }
 
   loadPdf();
 
-  document.getElementById('openBtn').onclick =
-    () => window.open(pdfUrl,'_blank');
-
+  document.getElementById('openBtn').onclick = () => window.open(pdfUrl,'_blank');
   document.getElementById('downloadBtn').href = pdfUrl;
 
   document.getElementById('copyBtn').onclick = async () => {
-    await navigator.clipboard.writeText(new URL(pdfUrl,location.href));
+    await navigator.clipboard.writeText(new URL(pdfUrl, location.href));
   };
 
   document.getElementById('zoomInBtn').onclick = () => {
@@ -184,8 +103,21 @@
   };
 
   fsBtn.onclick = async () => {
-    if(!document.fullscreenElement){
-      await viewer.requestFullscreen();
-      fsBtn.textContent = 'Exit full screen';
-    } else {
-      await
+    try {
+      if (!document.fullscreenElement) {
+        await viewer.requestFullscreen();
+        fsBtn.textContent = 'Exit full screen';
+      } else {
+        await document.exitFullscreen();
+        fsBtn.textContent = 'Full screen';
+      }
+    } catch (e) {
+      console.error('Fullscreen error:', e);
+    }
+  };
+</script>
+<noscript>
+  <p>JavaScript is required to view the PDF inline. <a href="TPV%20Munich.pdf">Open the PDF</a>.</p>
+</noscript>
+</body>
+</html>
