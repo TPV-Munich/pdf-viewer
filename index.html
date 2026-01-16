@@ -11,20 +11,20 @@
        Theme tokens (same accent for all themes)
        ============================== */
     :root{
-      --accent:#089ca4;                /* your color everywhere */
+      --accent:#089ca4;                /* your brand color everywhere */
       --text:#e8ecf4;
       --muted:#b7c1d6;
-      --bg:#0b1020;                    /* dark */
+      --bg:#0b1020;                    /* dark background */
       --bg-2:#0f152e;
       --card:rgba(255,255,255,.08);
       --ring:0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent);
       --shadow-lg:0 10px 30px rgba(0,0,0,.35);
     }
-    /* Light theme keeps the same accent */
+    /* Light theme keeps the SAME accent */
     [data-theme="light"]{
       --text:#101624;
       --muted:#3b455a;
-      --bg:#f5f7fb;                    /* light */
+      --bg:#f5f7fb;                    /* light background */
       --bg-2:#edf1f8;
       --card:rgba(255,255,255,.7);
       --shadow-lg:0 10px 30px rgba(16,22,36,.12);
@@ -43,7 +43,7 @@
 
     .wrap{ max-width:1100px; margin:clamp(16px,3.5vw,48px) auto; padding:0 16px; }
 
-    /* ===== Header (logo ABOVE the title) ===== */
+    /* ===== Header (logo ABOVE title) ===== */
     .header{
       display:flex; align-items:flex-start; justify-content:space-between; gap:16px; 
       margin-bottom:18px;
@@ -62,7 +62,6 @@
     .brand:hover .logo-img{ transform:translateY(-2px); transition:transform .12s ease; }
 
     .title{ font-size:clamp(22px, 3.2vw, 30px); font-weight:800; }
-    .muted{ color:var(--muted); font-weight:500; margin-top:-6px }
 
     /* Theme toggle */
     .toggle{ display:inline-flex; align-items:center; gap:10px; color:var(--muted); user-select:none; cursor:pointer; }
@@ -113,7 +112,7 @@
     /* ===== Viewer =====
        Height will be calculated to fit ONE page on screen.
     */
-    .viewer{ position:relative; height:70vh; background:#0002; }
+    .viewer{ position:relative; background:#0002; height:70vh; }
     .viewer iframe{ width:100%; height:100%; border:0; display:block; background:#1b2236; }
 
     /* Loading overlay */
@@ -140,8 +139,8 @@
       .foot{ flex-direction:column; align-items:flex-start; gap:6px }
     }
 
-    .btn:focus-visible, .switch:focus-visible { outline:none; box-shadow:var(--ring) }
-    a{ color:color-mix(in srgb, var(--accent) 80%, white) }
+    .btn:focus-visible, .switch:focus-visible { outline:none; box-shadow: var(--ring) }
+    a{ color: color-mix(in srgb, var(--accent) 80%, white) }
   </style>
 </head>
 <body>
@@ -149,10 +148,10 @@
     <!-- ===== Header (logo above title) ===== -->
     <header class="header" id="topHeader">
       <div class="brand">
-        <!-- IMPORTANT: real <img> tag (this fixes the “./BL_Technolas.png” text issue) -->
-        <img src="./BL_Technolas.png" class="logo-img" alt="Bausch & Lomb Technolas logo">
+        <!-- Real image tag for your uploaded logo -->
+        <img src="./BL_Technolas.png" alt="Bausch + Lomb Technolas logo" class="logo-img" />
         <div class="title">TPV B&amp;L Scan me</div>
-        <div class="muted">Fast • Clean • No watermark</div>
+        <!-- subtitle removed as requested -->
       </div>
 
       <label class="toggle" title="Toggle theme">
@@ -167,7 +166,7 @@
         <div class="card-title">TPV Munich — PDF</div>
         <div class="actions">
           <button class="btn accent" id="openBtn">Open</button>
-          <a id="downloadBtn" href="./TPV%20Munich.pdf" download class="btn">Download</a>
+          <a id="downloadBtn" class="btn" href="./TPV%20Munich.pdf" download>Download</a>
           <button class="btn" id="copyBtn">Copy link</button>
           <button class="btn ghost" id="fullscreenBtn">Full screen</button>
           <button class="btn ghost" id="fitPageBtn">Fit page</button>
@@ -204,9 +203,10 @@
     const viewer = document.getElementById('viewer');
     const fitPageBtn = document.getElementById('fitPageBtn');
     const fitWidthBtn = document.getElementById('fitWidthBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
 
     /* =========================
-       Load PDF once (avoid freezes)
+       Load PDF (no freeze) — default: Fit page
        ========================= */
     function setZoom(mode){   // 'page' or 'width'
       const hash = (mode === 'width') ? 'zoom=page-width' : 'zoom=page-fit';
@@ -214,6 +214,7 @@
       statusChip.textContent = (mode === 'width') ? 'Fit width' : 'Fit page';
     }
     setZoom('page'); // default: show whole page
+    downloadBtn.href = pdfUrl;
 
     let loaded = false;
     frame.addEventListener('load', () => {
@@ -222,7 +223,7 @@
       setTimeout(() => loading.style.display = 'none', 260);
     });
 
-    // If not loaded in ~6s (some iOS cases), remove loader and hint "Open externally"
+    // If not loaded in ~6s (some iOS cases), remove loader and hint
     setTimeout(() => {
       if (!loaded) {
         statusChip.textContent = 'Open externally';
@@ -233,7 +234,7 @@
 
     /* =========================
        Compute viewer height to fit ONE screen
-       (debounced to avoid jank / freezes)
+       (debounced to avoid jank)
        ========================= */
     function computeHeight(){
       const headerH = document.getElementById('topHeader').offsetHeight || 0;
@@ -284,7 +285,6 @@
 
     /* =========================
        Theme (auto + toggle + persist)
-       (accent color remains #089ca4 in both themes)
        ========================= */
     const savedTheme = localStorage.getItem('theme');
     const prefersLight = matchMedia('(prefers-color-scheme: light)').matches;
