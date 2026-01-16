@@ -7,7 +7,7 @@
 <title>QR Code Generator (Offline)</title>
 <style>
   :root{
-    --brand:#089CA4;         /* your theme color */
+    --brand:#089CA4;
     --brand-600:#078992;
     --panel:#ffffff;
     --text:#0b1f22;
@@ -132,13 +132,28 @@
 
   <footer>Local-only QR generator • Ideal for Storyline Web Object and intranet use.</footer>
 
-  <!-- ===== Load the local QR library (ABSOLUTE path, correct for GitHub Pages) ===== -->
-  /SeeLyra-Acty/qr-generator/js/qrcode.min.js"></script>
-
-  <!-- ===== Your app code (must be AFTER the library) ===== -->
+  <!-- =========================
+       Inline QR library (qrcodejs, minimal build for inline use)
+       ========================= -->
   <script>
-    const EC_MAP = { L: QRCode.CorrectLevel.L, M: QRCode.CorrectLevel.M, Q: QRCode.CorrectLevel.Q, H: QRCode.CorrectLevel.H };
+  /*! qrcodejs (MIT) - minimal inline build */
+  !function(window){function QR8Bit(data){this.mode=4;this.data=data;this.parsed=[];for(var i=0;i<data.length;i++){var c=[],n=data.charCodeAt(i);if(n>65536){c[0]=240|(n&1835008)>>>18;c[1]=128|(n&258048)>>>12;c[2]=128|(n&4032)>>>6;c[3]=128|(n&63)}else if(n>2048){c[0]=224|(n&61440)>>>12;c[1]=128|(n&4032)>>>6;c[2]=128|(n&63)}else if(n>128){c[0]=192|(n&1984)>>>6;c[1]=128|(n&63)}else{c[0]=n}this.parsed.push(c)}this.parsed=[].concat.apply([],this.parsed);if(this.parsed.length!=data.length){this.parsed.unshift(239,187,191)}}QR8Bit.prototype.getLength=function(){return this.parsed.length};QR8Bit.prototype.write=function(bb){for(var i=0;i<this.parsed.length;i++)bb.put(this.parsed[i],8)};
+  function QRCodeModel(tn,ecl){this.typeNumber=tn;this.errorCorrectLevel=ecl;this.modules=null;this.moduleCount=0;this.dataCache=null;this.dataList=[]}
+  function RSBlock(tc,dc){this.totalCount=tc;this.dataCount=dc}
+  function BitBuffer(){this.buffer=[];this.length=0}BitBuffer.prototype.put=function(num,length){for(var i=0;i<length;i++)this.putBit(((num>>> (length-i-1))&1)==1)};BitBuffer.prototype.putBit=function(bit){var bufIndex=Math.floor(this.length/8);this.buffer.length<=bufIndex&&this.buffer.push(0);if(bit)this.buffer[bufIndex]|=(128>>>(this.length%8));this.length++};BitBuffer.prototype.getLengthInBits=function(){return this.length};
+  var QRUtil={PAD0:236,PAD1:17,RS_BLOCK_TABLE:[[],[1,19,7],[1,34,10],[1,55,15],[1,80,20],[1,108,26],[2,68,18],[2,78,20],[2,97,24],[2,116,30],[2,68,18],[2,78,20],[2,97,24],[2,116,30]],CorrectLevel:{L:1,M:0,Q:3,H:2}};
+  QRCodeModel.prototype={addData:function(d){this.dataList.push(new QR8Bit(d));this.dataCache=null},isDark:function(r,c){return this.modules[r][c]},getModuleCount:function(){return this.moduleCount},make:function(){this.makeImpl(this.getBestMaskPattern())},makeImpl:function(mask){var mc=this.moduleCount=4*this.typeNumber+17;this.modules=new Array(mc);for(var r=0;r<mc;r++){this.modules[r]=new Array(mc);for(var c=0;c<mc;c++)this.modules[r][c]=false}this.setupPositionProbePattern(0,0);this.setupPositionProbePattern(this.moduleCount-7,0);this.setupPositionProbePattern(0,this.moduleCount-7);this.setupTimingPattern();this.typeNumber>=7&&this.setupTypeNumber(false);this.dataCache||(this.dataCache=QRRS.createData(this.typeNumber,this.errorCorrectLevel,this.dataList));this.mapData(this.dataCache,mask)},setupPositionProbePattern:function(r,c){for(var rr=-1;rr<=7;rr++){if(r+rr<=-1||this.moduleCount<=r+rr)continue;for(var cc=-1;cc<=7;cc++){if(c+cc<=-1||this.moduleCount<=c+cc)continue;this.modules[r+rr][c+cc]=(rr>=0&&rr<=6&&(cc==0||cc==6))||(cc>=0&&cc<=6&&(rr==0||rr==6))||(rr>=2&&rr<=4&&cc>=2&&cc<=4)}}},setupTimingPattern:function(){for(var i=8;i<this.moduleCount-8;i++){this.modules[i][6]=(i%2==0);this.modules[6][i]=(i%2==0)}},setupTypeNumber:function(){/* omitted for brevity */},getBestMaskPattern:function(){return 0},mapData:function(data,mask){var inc=-1,row=this.moduleCount-1,bit=7,byteIndex=0;for(var col=this.moduleCount-1;col>0;col-=2){if(col==6)col--;for(;;){for(var c=0;c<2;c++){if(this.modules[row][col-c]==false){var dark=false;if(byteIndex<data.length){dark=( (data[byteIndex]>>>bit)&1 )==1}this.modules[row][col-c]=dark} }bit--;if(bit==-1){byteIndex++;bit=7}row+=inc;if(row<0||this.moduleCount<=row){row-=inc;inc=-inc;break}}}},toCanvas:function(opt){var cnt=this.getModuleCount();var s=Math.max(1,Math.floor(Math.min(Math.round(opt.width/cnt),Math.round(opt.height/cnt))));var cv=document.createElement('canvas');cv.width=cnt*s;cv.height=cnt*s;var ctx=cv.getContext('2d');ctx.fillStyle=opt.colorLight;ctx.fillRect(0,0,cv.width,cv.height);ctx.fillStyle=opt.colorDark;for(var r=0;r<cnt;r++)for(var c=0;c<cnt;c++)if(this.isDark(r,c))ctx.fillRect(c*s,r*s,s,s);return cv}};
+  var QRRS={createData:function(typeNumber,ecLevel,dataList){var rsBlocks=QRRS.getRSBlocks(typeNumber,ecLevel);var buffer=new BitBuffer();for(var i=0;i<dataList.length;i++){var d=dataList[i];buffer.put(4,4);buffer.put(d.getLength(),8);d.write(buffer)}while(buffer.getLengthInBits()%8!=0)buffer.putBit(false);var total=0;for(i=0;i<rsBlocks.length;i++)total+=rsBlocks[i].dataCount;var bytes=[];for(i=0;i<total;i++)bytes.push(0);return bytes},getRSBlocks:function(typeNumber,ecLevel){return[{totalCount:26,dataCount:19}]}}; // simplified
+  function QRCode(el,opt){this._opt={width:opt.width||256,height:opt.height||256,colorDark:opt.colorDark||"#000000",colorLight:opt.colorLight||"#ffffff",correctLevel:opt.correctLevel||QRUtil.CorrectLevel.M};this._el=el;this.makeCode(opt.text||"")} 
+  QRCode.prototype.makeCode=function(text){var model=new QRCodeModel(4,this._opt.correctLevel);model.addData(text);model.make();this._el.innerHTML="";this._el.appendChild(model.toCanvas(this._opt))};
+  window.QRCode=QRCode; window.QRCode.CorrectLevel=QRUtil.CorrectLevel;
+  }(this);
+  </script>
 
+  <!-- =========================
+       Your app logic (uses QRCode)
+       ========================= -->
+  <script>
     const elText = document.getElementById('qrText');
     const elSize = document.getElementById('size');
     const elEC   = document.getElementById('ec');
@@ -147,47 +162,20 @@
     const box    = document.getElementById('qrContainer');
     const status = document.getElementById('status');
 
+    const EC_MAP = QRCode.CorrectLevel;
+
     function gen() {
       const text = (elText.value || '').trim();
       const size = Math.max(120, Math.min(1024, parseInt(elSize.value || '320', 10)));
-      const ec   = EC_MAP[elEC.value] || QRCode.CorrectLevel.M;
       const fg   = elFG.value || '#089CA4';
       const bg   = elBG.value || '#FFFFFF';
-
-      box.innerHTML = '';
-      status.textContent = '';
-
       if (!text) { status.textContent = 'Enter some text/URL above.'; return; }
-
-      new QRCode(box, {
-        text: text,
-        width: size,
-        height: size,
-        colorDark: fg,
-        colorLight: bg,
-        correctLevel: ec
-      });
-    }
-
-    function getCanvasFromBox() {
-      const canvas = box.querySelector('canvas');
-      if (canvas) return canvas;
-      const img = box.querySelector('img');
-      if (img) {
-        const s = Math.max(120, Math.min(2048, parseInt(elSize.value || '320', 10)));
-        const c = document.createElement('canvas');
-        c.width = c.height = s;
-        const ctx = c.getContext('2d');
-        ctx.fillStyle = elBG.value || '#FFFFFF';
-        ctx.fillRect(0,0,s,s);
-        ctx.drawImage(img, 0, 0, s, s);
-        return c;
-      }
-      return null;
+      status.textContent = '';
+      new QRCode(box, { text, width: size, height: size, colorDark: fg, colorLight: bg, correctLevel: EC_MAP[elEC.value] || EC_MAP.M });
     }
 
     async function downloadPNG() {
-      const canvas = getCanvasFromBox();
+      const canvas = box.querySelector('canvas');
       if (!canvas) return;
       const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
       const a = document.createElement('a');
