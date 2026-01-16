@@ -106,9 +106,9 @@
     try {
       if (!document.fullscreenElement) {
         await viewer.requestFullscreen();
-        fsBtn.textContent = 'Exit full screen';
+        fsBtn.textContent = 'Open full screen';
       } else {
-        await document.exitFullscreen();
+        await document.OpenFullscreen();
         fsBtn.textContent = 'Full screen';
       }
     } catch (e) {
