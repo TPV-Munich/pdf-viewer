@@ -1,1 +1,344 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PDF Viewer</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root{
+      --bg: #0b1020;
+      --bg-2: #0f152e;
+      --card: rgba(255,255,255,0.08);
+      --text: #e8ecf4;
+      --muted: #b7c1d6;
+      --accent-1:#7c3aed; /* purple */
+      --accent-2:#06b6d4; /* cyan */
+      --accent-3:#22c55e; /* green */
+      --ring: 0 0 0 2px color-mix(in srgb, var(--accent-2) 50%, transparent);
+      --shadow-lg: 0 10px 30px rgba(0,0,0,.35);
+    }
+    [data-theme="light"]{
+      --bg: #f5f7fb;
+      --bg-2:#edf1f8;
+      --card: rgba(255,255,255,0.7);
+      --text:#101624;
+      --muted:#3b455a;
+      --shadow-lg: 0 10px 30px rgba(16,22,36,.12);
+    }
+
+    /* Page background with animated gradient blobs */
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #7c3aed22, transparent 50%),
+        radial-gradient(1200px 700px at 120% 10%, #06b6d422, transparent 50%),
+        radial-gradient(900px 500px at -10% 110%, #22c55e22, transparent 45%),
+        linear-gradient(160deg, var(--bg), var(--bg-2));
+      font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      overflow-y: overlay;
+    }
+
+    /* Container */
+    .wrap{
+      max-width: 1100px;
+      margin: clamp(16px, 3.5vw, 48px) auto;
+      padding: 0 16px;
+    }
+
+    /* Header */
+    .header{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:16px; margin-bottom:18px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px; font-weight:700;
+      letter-spacing:.2px;
+    }
+    .logo{
+      width:38px; height:38px; border-radius:12px;
+      background:
+        conic-gradient(from 40deg, var(--accent-1), var(--accent-2), var(--accent-3), var(--accent-1));
+      filter: saturate(120%);
+      position:relative;
+      box-shadow: 0 4px 18px rgba(124,58,237,.45);
+    }
+    .logo::after{
+      content:""; position:absolute; inset:2px; border-radius:10px;
+      background: linear-gradient(180deg, #ffffffaa, #ffffff10);
+      backdrop-filter: blur(1px);
+    }
+    .title{
+      font-size: clamp(18px, 2.4vw, 24px);
+    }
+    .muted{color:var(--muted); font-weight:500}
+
+    /* Card (glass + gradient border) */
+    .card{
+      position:relative; border-radius:18px;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--card) 90%, transparent), var(--card));
+      box-shadow: var(--shadow-lg);
+      overflow:hidden;
+      backdrop-filter: blur(8px);
+      border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+      isolation: isolate;
+    }
+    .card::before{
+      content:""; position:absolute; inset:-1px; z-index:-1; border-radius:20px;
+      background: linear-gradient(120deg, color-mix(in srgb, var(--accent-1) 70%, transparent), color-mix(in srgb, var(--accent-2) 70%, transparent), color-mix(in srgb, var(--accent-3) 70%, transparent));
+      filter: blur(18px) saturate(120%); opacity:.55;
+      animation: float 8s ease-in-out infinite alternate;
+    }
+    @keyframes float{
+      from { transform: translateY(-4px) rotate(0.5deg); opacity:.5 }
+      to   { transform: translateY(4px) rotate(-0.5deg); opacity:.8 }
+    }
+
+    .card-head{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 14px clamp(14px, 2.2vw, 20px);
+      border-bottom: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+    }
+    .card-title{ font-size: clamp(16px, 2vw, 20px); font-weight:700; }
+
+    /* Actions */
+    .actions{ display:flex; flex-wrap:wrap; gap:8px; }
+    .btn{
+      appearance:none; border:none; cursor:pointer;
+      padding:10px 12px; border-radius:12px; font-weight:700;
+      color: #0b1020; background: linear-gradient(180deg,#fff,#eaf1ff);
+      box-shadow: 0 6px 20px rgba(16,22,36,.15);
+      transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .btn:hover{ transform: translateY(-2px); box-shadow: 0 10px 28px rgba(16,22,36,.22) }
+    .btn:active{ transform: translateY(0) scale(.98) }
+    .btn.accent{
+      color: white;
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      box-shadow: 0 8px 24px color-mix(in srgb, var(--accent-1) 45%, transparent);
+    }
+    .btn.ghost{
+      background: transparent; color: var(--text); border:1px solid color-mix(in srgb, var(--text) 16%, transparent);
+      box-shadow: none;
+    }
+    .chip{ font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid color-mix(in srgb, var(--text) 16%, transparent); color:var(--muted) }
+
+    /* Viewer */
+    .viewer{
+      position:relative; height: min(84vh, 1000px); background: #0002;
+    }
+    .viewer iframe, .viewer embed{
+      width:100%; height:100%; border:0; display:block; background:#1b2236;
+    }
+
+    /* Loading overlay */
+    .loading{
+      position:absolute; inset:0; display:grid; place-items:center; background: linear-gradient(180deg, #0b102015, transparent);
+      transition: opacity .25s ease; z-index:2;
+    }
+    .spinner{
+      width:56px; height:56px; border-radius:50%;
+      background:
+        conic-gradient(from 0deg, var(--accent-2), var(--accent-1), var(--accent-3), var(--accent-2));
+      -webkit-mask: radial-gradient(farthest-side, transparent 62%, #000 63%);
+              mask: radial-gradient(farthest-side, transparent 62%, #000 63%);
+      animation: spin 1s linear infinite;
+      filter: saturate(130%) drop-shadow(0 6px 20px rgba(0,0,0,.35));
+    }
+    @keyframes spin{ to{ transform: rotate(1turn)} }
+
+    /* Footer */
+    .foot{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 10px clamp(14px, 2.2vw, 20px);
+      border-top: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Theme toggle */
+    .toggle{
+      display:inline-flex; align-items:center; gap:10px; color:var(--muted);
+      user-select:none; cursor:pointer;
+    }
+    .switch{
+      width:48px; height:28px; border-radius:999px; position:relative; background:#ffffff22; border:1px solid color-mix(in srgb, var(--text) 20%, transparent);
+    }
+    .switch::after{
+      content:""; width:22px; height:22px; border-radius:50%;
+      position:absolute; top:2px; left:2px; background:white;
+      box-shadow: 0 4px 12px rgba(0,0,0,.2);
+      transition: left .2s ease;
+    }
+    [data-theme="light"] .switch::after{ left:24px }
+
+    /* Mobile tweaks */
+    @media (max-width:720px){
+      .viewer{ height: 78vh }
+      .actions{ width:100% }
+      .header{ flex-direction:column; align-items:flex-start }
+      .foot{ flex-direction:column; align-items:flex-start; gap:6px }
+    }
+
+    /* Accessibility focus */
+    .btn:focus-visible, .switch:focus-visible { outline: none; box-shadow: var(--ring) }
+    a{ color: color-mix(in srgb, var(--accent-2) 80%, white) }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <div class="title">Document Viewer</div>
+          <div class="muted">Fast • Clean • No watermark</div>
+        </div>
+      </div>
+
+      <label class="toggle">
+        <span>Theme</span>
+        <div class="switch" id="themeSwitch" tabindex="0" role="switch" aria-checked="false"></div>
+      </label>
+    </header>
+
+    <!-- Card -->
+    <section class="card" id="card">
+      <div class="card-head">
+        <div class="card-title">TPV Munich — PDF</div>
+        <div class="actions">
+          <button class="btn accent" id="openBtn">Open</button>
+          <a class="btn" id="downloadBtn" href="./TPV%20Munich.pdf" download>Download</a>
+          <button class="btn" id="copyBtn">Copy link</button>
+          <button class="btn ghost" id="fullscreenBtn">Full screen</button>
+          <span class="chip" id="statusChip">Loading…</span>
+        </div>
+      </div>
+
+      <div class="viewer" id="viewer">
+        <div class="loading" id="loading">
+          <div class="spinner" aria-hidden="true"></div>
+        </div>
+        <!-- Using <iframe> ensures the browser’s native PDF viewer is used -->
+        <iframe id="pdfFrame" title="PDF document"></iframe>
+      </div>
+
+      <div class="foot">
+        <div>Tip: If the PDF doesn’t appear on some phones, tap <strong>Open</strong>.</div>
+        <div>Served by GitHub Pages — zero tracking, zero ads.</div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /* =========================
+       CONFIG — set your PDF file here
+       ========================= */
+    const pdfUrl = './TPV%20Munich.pdf'; // If you rename the file, update this path.
+
+    /* ====== Elements ====== */
+    const frame = document.getElementById('pdfFrame');
+    const loading = document.getElementById('loading');
+    const statusChip = document.getElementById('statusChip');
+    const openBtn = document.getElementById('openBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const fsBtn = document.getElementById('fullscreenBtn');
+    const themeSwitch = document.getElementById('themeSwitch');
+    const viewer = document.getElementById('viewer');
+
+    /* ====== Load PDF with fit & toolbar hint ====== */
+    const urlWithParams = `${pdfUrl}#view=FitH&toolbar=1&statusbar=0&navpanes=0`;
+    frame.src = urlWithParams;
+
+    let loaded = false;
+    frame.addEventListener('load', () => {
+      loaded = true;
+      loading.style.opacity = '0';
+      setTimeout(() => loading.style.display = 'none', 260);
+      statusChip.textContent = 'Ready';
+    });
+
+    // Fallback: if not loaded in 6s (rare iOS cases), show Open hint.
+    setTimeout(() => {
+      if (!loaded) {
+        statusChip.textContent = 'Open externally';
+        loading.style.opacity = '0';
+        setTimeout(() => loading.style.display = 'none', 260);
+      }
+    }, 6000);
+
+    /* ====== Actions ====== */
+    openBtn.addEventListener('click', () => window.open(pdfUrl, '_blank', 'noopener,noreferrer'));
+
+    copyBtn.addEventListener('click', async () => {
+      try{
+        const absolute = new URL(pdfUrl, location.href).href;
+        await navigator.clipboard.writeText(absolute);
+        toast('Link copied');
+      }catch{
+        toast('Copy failed — long-press the Open button and copy link.');
+      }
+    });
+
+    fsBtn.addEventListener('click', async () => {
+      const el = viewer;
+      try{
+        if (!document.fullscreenElement) {
+          await (el.requestFullscreen?.() || el.webkitRequestFullscreen?.());
+          fsBtn.textContent = 'Exit full screen';
+        } else {
+          await (document.exitFullscreen?.() || document.webkitExitFullscreen?.());
+          fsBtn.textContent = 'Full screen';
+        }
+      }catch{
+        toast('Fullscreen not supported here');
+      }
+    });
+
+    /* ====== Theme (auto + toggle) ====== */
+    const savedTheme = localStorage.getItem('theme');
+    const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+    const initial = savedTheme || (prefersLight ? 'light' : 'dark');
+    document.documentElement.setAttribute('data-theme', initial);
+    themeSwitch.setAttribute('aria-checked', initial === 'light');
+
+    function toggleTheme(){
+      const cur = document.documentElement.getAttribute('data-theme');
+      const next = cur === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      themeSwitch.setAttribute('aria-checked', next === 'light');
+    }
+    themeSwitch.addEventListener('click', toggleTheme);
+    themeSwitch.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); toggleTheme(); }});
+
+    /* ====== Tiny toast ====== */
+    function toast(msg){
+      const t = document.createElement('div');
+      t.textContent = msg;
+      Object.assign(t.style,{
+        position:'fixed', left:'50%', bottom:'22px', transform:'translateX(-50%)',
+        background:'linear-gradient(135deg, var(--accent-2), var(--accent-1))',
+        color:'#fff', padding:'10px 14px', borderRadius:'12px', boxShadow:'0 8px 24px rgba(0,0,0,.28)',
+        zIndex:9999, fontWeight:'700'
+      });
+      document.body.appendChild(t);
+      setTimeout(()=> t.style.opacity='0', 1400);
+      setTimeout(()=> t.remove(), 1800);
+    }
+
+    /* ====== Accessibility: keyboard shortcuts ====== */
+    document.addEventListener('keydown', (e)=>{
+      if(e.key.toLowerCase() === 'o') openBtn.click();      // O = Open
+      if(e.key.toLowerCase() === 'f') fsBtn.click();        // F = Full screen
+      if((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==='c') copyBtn.click(); // Ctrl/Cmd + C
+    });
+  </script>
+</body>
+</html>
+
