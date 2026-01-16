@@ -146,7 +146,7 @@
     <!-- ===== Header (logo above title) ===== -->
     <header class="header" id="topHeader">
       <div class="brand">
-        <img src="./BL_Technolas.png" alt="Bausch & Lomb Technolas logo" class="logo-img" />
+        ./BL_Technolas.png
         <div class="title">TPV B&amp;L Scan me</div>
         <div class="muted">Fast • Clean • No watermark</div>
       </div>
@@ -163,7 +163,7 @@
         <div class="card-title">TPV Munich — PDF</div>
         <div class="actions">
           <button class="btn accent" id="openBtn">Open</button>
-          <a id="downloadBtn" href="./TPV%20Munich.pdf" download class="btn">Download</a>
+          ./TPV%20Munich.pdfDownload</a>
           <button class="btn" id="copyBtn">Copy link</button>
           <button class="btn ghost" id="fullscreenBtn">Full screen</button>
           <button class="btn ghost" id="fitPageBtn">Fit page</button>
@@ -215,7 +215,9 @@
     let loaded = false;
     frame.addEventListener('load', () => {
       loaded = true;
-      loading.style.opacity =m()
+      loading.style.opacity = '0';
+      setTimeout(() => loading.style.display = 'none', 260);
+      // keep statusChip text set by loadWithZoom()
     });
 
     // If not loaded in ~6s (some iOS cases), remove loader and hint "Open externally"
