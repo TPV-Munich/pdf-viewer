@@ -1,156 +1,263 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PDF Viewer</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PDF Viewer</title>
+  <meta name="color-scheme" content="light dark" />
 
-<style>
-:root{
-  --accent:#0bb3b9;
-  --accent-dark:#067c81;
-  --bg:#f4f7fb;
-  --border:#1e2a3a;
-}
+  <style>
+    :root{
+      --accent:#089ca4;
+      --text:#e8ecf4;
+      --muted:#b7c1d6;
+      --bg:#0b1020;
+      --bg-2:#0f152e;
+      --card:rgba(255,255,255,.08);
+      --ring:0 0 0 2px rgba(8,156,164,.45);
+      --shadow-lg:0 10px 30px rgba(0,0,0,.35);
+    }
+    [data-theme="light"]{
+      --text:#101624;
+      --muted:#3b455a;
+      --bg:#f5f7fb;
+      --bg-2:#edf1f8;
+      --card:rgba(255,255,255,.7);
+      --shadow-lg:0 10px 30px rgba(16,22,36,.12);
+    }
 
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  background:var(--bg);
-}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(8,156,164,.28), transparent 55%),
+        radial-gradient(1000px 600px at 120% 10%, rgba(8,156,164,.22), transparent 55%),
+        linear-gradient(160deg, var(--bg), var(--bg-2));
+      font:15px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      overflow-y: overlay;
+    }
 
-.wrap{
-  max-width:1100px;
-  margin:32px auto;
-  padding:0 16px;
-}
+    .wrap{max-width:1100px;margin:clamp(16px,3.5vw,48px) auto;padding:0 16px}
 
-.card{
-  border-radius:18px;
-  background:#fff;
-  border:2px solid var(--border);
-  box-shadow:0 10px 30px rgba(0,0,0,.15);
-  overflow:hidden;
-}
+    /* ===== Header ===== */
+    .header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
 
-/* ===== Toolbar ===== */
-.toolbar{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  padding:14px;
-  border-bottom:2px solid var(--border);
-  background:#fff;
-}
+    .logo-img{
+      width:min(420px, 120vw);
+      height:auto;
+      display:block;
+      background:transparent;
+    }
 
-.btn{
-  border:none;
-  padding:10px 16px;
-  border-radius:12px;
-  font-weight:700;
-  cursor:pointer;
-  color:#fff;
-  background:linear-gradient(135deg,var(--accent),var(--accent-dark));
-  box-shadow:0 6px 18px rgba(11,179,185,.35);
-}
+    /* ===== Theme toggle ===== */
+    .toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      color:var(--muted);
+      user-select:none;
+      cursor:pointer;
+    }
+    .switch{
+      width:52px;
+      height:30px;
+      border-radius:999px;
+      position:relative;
+      background:#ffffff22;
+      border:1px solid rgba(255,255,255,.15);
+    }
+    .switch::after{
+      content:"";
+      width:24px;
+      height:24px;
+      border-radius:50%;
+      position:absolute;
+      top:3px;
+      left:3px;
+      background:#fff;
+      box-shadow:0 4px 12px rgba(0,0,0,.2);
+      transition:left .2s ease;
+    }
+    [data-theme="light"] .switch::after{ left:25px }
 
-.btn.secondary{
-  background:#eaf6f7;
-  color:#003b3f;
-  box-shadow:none;
-  border:2px solid var(--border);
-}
+    /* ===== Card ===== */
+    .card{
+      border-radius:18px;
+      overflow:hidden;
+      background:linear-gradient(180deg, var(--card), var(--card));
+      box-shadow:var(--shadow-lg);
+      border:1px solid rgba(255,255,255,.12);
+    }
 
-.btn:active{transform:scale(.97)}
+    .card-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:14px 20px;
+      border-bottom:1px solid rgba(255,255,255,.12);
+    }
 
-.spacer{flex:1}
+    .card-title{
+      font-size:18px;
+      font-weight:800;
+    }
 
-/* ===== Viewer ===== */
-.viewer{
-  height:75vh;
-  background:#111;
-}
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
 
-.viewer iframe{
-  width:100%;
-  height:100%;
-  border:0;
-}
-</style>
+    .btn{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      padding:10px 12px;
+      border-radius:12px;
+      font-weight:800;
+      background:#fff;
+      color:#0b1020;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .btn.accent{
+      background:linear-gradient(135deg, var(--accent), #16c4cf);
+      color:#fff;
+    }
+
+    .btn.ghost{
+      background:transparent;
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.16);
+    }
+
+    .chip{
+      font-size:12px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.16);
+      color:var(--muted);
+    }
+
+    .viewer{
+      background:#0002;
+      height:70vh;
+    }
+
+    .viewer iframe{
+      width:100%;
+      height:100%;
+      border:0;
+      display:block;
+    }
+
+    .foot{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 20px;
+      border-top:1px solid rgba(255,255,255,.12);
+      color:var(--muted);
+      font-size:13px;
+    }
+  </style>
 </head>
 
 <body>
 <div class="wrap">
 
-  <section class="card">
+  <!-- Header -->
+  <header class="header" id="topHeader">
+    <img class="logo-img" src="BL_Technolas.png" alt="Bausch + Lomb | Technolas logo">
 
-    <!-- Toolbar -->
-    <div class="toolbar">
-      <button class="btn" id="openBtn">Open</button>
-      <a class="btn secondary" id="downloadBtn" download>Download</a>
-      <button class="btn secondary" id="copyBtn">Copy link</button>
+    <label class="toggle" id="themeToggle">
+      <span>Theme</span>
+      <div class="switch" id="themeSwitch"></div>
+    </label>
+  </header>
 
-      <div class="spacer"></div>
+  <!-- Card -->
+  <section class="card" id="card">
+    <div class="card-head" id="cardHead">
+      <div class="card-title">Acty Guide Support — PDF</div>
 
-      <button class="btn secondary" id="zoomOut">−</button>
-      <button class="btn secondary" id="zoomIn">+</button>
-
-      <button class="btn" id="fsBtn">Full screen</button>
+      <div class="actions">
+        <button class="btn accent" id="openBtn">Open</button>
+        <a class="btn" id="downloadBtn" href="TPV%20Munich.pdf" download>Download</a>
+        <button class="btn" id="copyBtn">Copy link</button>
+        <button class="btn ghost" id="fullscreenBtn">Full screen</button>
+        <button class="btn ghost" id="fitPageBtn">Fit page</button>
+        <button class="btn ghost" id="fitWidthBtn">Fit width</button>
+        <span class="chip" id="statusChip">Loading…</span>
+      </div>
     </div>
 
-    <!-- Viewer -->
     <div class="viewer" id="viewer">
       <iframe id="pdfFrame"></iframe>
     </div>
 
+    <div class="foot" id="cardFoot">
+      <div>Tip: If the PDF doesn’t appear on some phones, tap <strong>Open</strong>.</div>
+      <div>Powered By Technolas Bausch + Lomb</div>
+    </div>
   </section>
 
 </div>
 
 <script>
-const pdfUrl = './TPV%20Munich.pdf';
-const frame = document.getElementById('pdfFrame');
-const viewer = document.getElementById('viewer');
-const fsBtn = document.getElementById('fsBtn');
+  const pdfUrl = './TPV%20Munich.pdf';
+  const frame = document.getElementById('pdfFrame');
+  const statusChip = document.getElementById('statusChip');
 
-let zoom = 100;
-
-function loadPdf(){
-  frame.src = `${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&zoom=${zoom}`;
-}
-
-loadPdf();
-
-/* Buttons */
-document.getElementById('openBtn').onclick =
-  () => window.open(pdfUrl,'_blank');
-
-document.getElementById('downloadBtn').href = pdfUrl;
-
-document.getElementById('copyBtn').onclick = async () => {
-  await navigator.clipboard.writeText(new URL(pdfUrl,location.href));
-};
-
-document.getElementById('zoomIn').onclick = () => {
-  zoom = Math.min(200, zoom + 10);
-  loadPdf();
-};
-
-document.getElementById('zoomOut').onclick = () => {
-  zoom = Math.max(50, zoom - 10);
-  loadPdf();
-};
-
-/* Fullscreen */
-fsBtn.onclick = async () => {
-  if(!document.fullscreenElement){
-    await viewer.requestFullscreen();
-    fsBtn.textContent = 'Exit full screen';
-  } else {
-    await document.exitFullscreen();
-    fsBtn.textContent = 'Full screen';
+  function setZoom(mode){
+    const hash = mode === 'width' ? 'zoom=page-width' : 'zoom=page-fit';
+    frame.src = `${pdfUrl}#page=1&${hash}&toolbar=1&navpanes=0`;
+    statusChip.textContent = mode === 'width' ? 'Fit width' : 'Fit page';
   }
-};
+
+  setZoom('page');
+
+  document.getElementById('openBtn').onclick =
+    () => window.open(pdfUrl, '_blank');
+
+  document.getElementById('fitPageBtn').onclick =
+    () => setZoom('page');
+
+  document.getElementById('fitWidthBtn').onclick =
+    () => setZoom('width');
+
+  document.getElementById('copyBtn').onclick = async () => {
+    await navigator.clipboard.writeText(new URL(pdfUrl, location.href));
+    statusChip.textContent = 'Link copied';
+  };
+
+  document.getElementById('fullscreenBtn').onclick = async () => {
+    if (!document.fullscreenElement)
+      await document.getElementById('viewer').requestFullscreen();
+    else
+      await document.exitFullscreen();
+  };
+
+  // Theme
+  const themeSwitch = document.getElementById('themeSwitch');
+  const saved = localStorage.getItem('theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+
+  themeSwitch.onclick = () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  };
 </script>
 
 </body>
